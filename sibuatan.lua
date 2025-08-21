@@ -6,7 +6,7 @@ local char = player.Character or player.CharacterAdded:Wait()
 local locations = {
     ["Basecamp"]        = Vector3.new(987, 112, -698),
     ["Pos Pendakian"]   = Vector3.new(5200, 4000, 2100),
-    ["Puncak Sibuatan"] = Vector3.new(5322, 8119, 2150)
+    ["Puncak Sibuatan"] = Vector3.new(5344, 8113, 2117)
 }
 
 -- GUI utama
