@@ -1,99 +1,93 @@
--- Teleport Gunung Sibuatan + GUI Multi-Tombol + Custom Save Lokasi
+-- Teleport Gunung Sibuatan + GUI Minimalis
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 
 -- Lokasi default
 local locations = {
-["Basecamp"] = Vector3.new(987, 112, -698),
-["Pos Pendakian"] = Vector3.new(5200, 4000, 2100),
-["Puncak Sibuatan"] = Vector3.new(5394, 8108, 2205)
+    ["Basecamp"]        = Vector3.new(987, 112, -698),
+    ["Pos Pendakian"]   = Vector3.new(5200, 4000, 2100),
+    ["Puncak Sibuatan"] = Vector3.new(5394, 8108, 2205)
 }
 
 -- GUI utama
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = game.CoreGui
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
 
-local Frame = Instance.new("Frame")
-Frame.Parent = ScreenGui
-Frame.Size = UDim2.new(0, 240, 0, 260)
-Frame.Position = UDim2.new(0.4, 0, 0.6, 0)
-Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-Frame.BackgroundTransparency = 0.2
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0, 220, 0, 230)
+Frame.Position = UDim2.new(0.4, 0, 0.55, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 Frame.BorderSizePixel = 0
+Frame.Active = true
 
-local Title = Instance.new("TextLabel")
-Title.Parent = Frame
-Title.Size = UDim2.new(1, -40, 0, 40)
-Title.Position = UDim2.new(0, 5, 0, 0)
+local Title = Instance.new("TextLabel", Frame)
+Title.Size = UDim2.new(1, -30, 0, 35)
+Title.Position = UDim2.new(0, 10, 0, 0)
 Title.BackgroundTransparency = 1
-Title.Font = Enum.Font.SourceSansBold
+Title.Font = Enum.Font.GothamBold
 Title.Text = "Teleport Sibuatan"
-Title.TextSize = 20
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 18
+Title.TextColor3 = Color3.fromRGB(220, 220, 220)
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Tombol Close/Show
-local CloseBtn = Instance.new("TextButton")
-CloseBtn.Parent = Frame
-CloseBtn.Size = UDim2.new(0, 35, 0, 35)
-CloseBtn.Position = UDim2.new(1, -40, 0, 2)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.Font = Enum.Font.SourceSansBold
-CloseBtn.TextSize = 20
-CloseBtn.Text = "X"
+-- Tombol Close/Show (minimalis)
+local CloseBtn = Instance.new("TextButton", Frame)
+CloseBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseBtn.Position = UDim2.new(1, -30, 0, 5)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+CloseBtn.BorderSizePixel = 0
+CloseBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 16
+CloseBtn.Text = "–"
 
--- Frame untuk tombol teleport
-local ButtonFrame = Instance.new("Frame")
-ButtonFrame.Parent = Frame
-ButtonFrame.Size = UDim2.new(1, -10, 1, -90)
-ButtonFrame.Position = UDim2.new(0, 5, 0, 45)
+-- Frame tombol teleport
+local ButtonFrame = Instance.new("Frame", Frame)
+ButtonFrame.Size = UDim2.new(1, -20, 1, -80)
+ButtonFrame.Position = UDim2.new(0, 10, 0, 40)
 ButtonFrame.BackgroundTransparency = 1
 
 -- Tombol Save Lokasi
-local SaveBtn = Instance.new("TextButton")
-SaveBtn.Parent = Frame
-SaveBtn.Size = UDim2.new(1, -10, 0, 40)
-SaveBtn.Position = UDim2.new(0, 5, 1, -45)
-SaveBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
-SaveBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-SaveBtn.Font = Enum.Font.SourceSansBold
-SaveBtn.TextSize = 18
+local SaveBtn = Instance.new("TextButton", Frame)
+SaveBtn.Size = UDim2.new(1, -20, 0, 32)
+SaveBtn.Position = UDim2.new(0, 10, 1, -40)
+SaveBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SaveBtn.BorderSizePixel = 0
+SaveBtn.TextColor3 = Color3.fromRGB(230, 230, 230)
+SaveBtn.Font = Enum.Font.Gotham
+SaveBtn.TextSize = 16
 SaveBtn.Text = "Save Lokasi Saya"
 
--- Function untuk membuat tombol teleport
+-- Function buat tombol teleport
 local function createTeleportButton(name, pos)
-local btn = Instance.new("TextButton")
-btn.Parent = ButtonFrame
-btn.Size = UDim2.new(1, 0, 0, 35)
-btn.BackgroundColor3 = Color3.fromRGB(50, 150, 250)
-btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-btn.Font = Enum.Font.SourceSansBold
-btn.TextSize = 18
-btn.Text = name
+    local btn = Instance.new("TextButton", ButtonFrame)
+    btn.Size = UDim2.new(1, 0, 0, 28)
+    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    btn.BorderSizePixel = 0
+    btn.TextColor3 = Color3.fromRGB(230, 230, 230)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 15
+    btn.Text = name
 
--- klik untuk teleport  
-btn.MouseButton1Click:Connect(function()  
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then  
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(pos)  
-    end  
-end)
-
+    btn.MouseButton1Click:Connect(function()
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            player.Character.HumanoidRootPart.CFrame = CFrame.new(pos)
+        end
+    end)
 end
 
 -- Isi tombol awal
 for name, pos in pairs(locations) do
-createTeleportButton(name, pos)
+    createTeleportButton(name, pos)
 end
 
 -- Save lokasi custom
 SaveBtn.MouseButton1Click:Connect(function()
-if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-local pos = player.Character.HumanoidRootPart.Position
-local name = "Custom-"..math.random(1000,9999)
-createTeleportButton(name, pos)
-print("Lokasi disimpan:", pos)
-end
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local pos = player.Character.HumanoidRootPart.Position
+        local name = "Custom-" .. math.random(1000,9999)
+        createTeleportButton(name, pos)
+        print("Lokasi disimpan:", pos)
+    end
 end)
 
 -- Fitur draggable frame
@@ -101,50 +95,50 @@ local UIS = game:GetService("UserInputService")
 local dragging, dragInput, mousePos, framePos
 
 Frame.InputBegan:Connect(function(input)
-if input.UserInputType == Enum.UserInputType.MouseButton1 and input.Position.Y < (Frame.AbsolutePosition.Y + 40) then
-dragging = true
-mousePos = input.Position
-framePos = Frame.Position
+    if input.UserInputType == Enum.UserInputType.MouseButton1 
+    and input.Position.Y < (Frame.AbsolutePosition.Y + 35) then
+        dragging = true
+        mousePos = input.Position
+        framePos = Frame.Position
 
-input.Changed:Connect(function()  
-        if input.UserInputState == Enum.UserInputState.End then  
-            dragging = false  
-        end  
-    end)  
-end
-
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
 end)
 
 Frame.InputChanged:Connect(function(input)
-if input.UserInputType == Enum.UserInputType.MouseMovement then
-dragInput = input
-end
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
 end)
 
 UIS.InputChanged:Connect(function(input)
-if input == dragInput and dragging then
-local delta = input.Position - mousePos
-Frame.Position = UDim2.new(
-framePos.X.Scale,
-framePos.X.Offset + delta.X,
-framePos.Y.Scale,
-framePos.Y.Offset + delta.Y
-)
-end
+    if input == dragInput and dragging then
+        local delta = input.Position - mousePos
+        Frame.Position = UDim2.new(
+            framePos.X.Scale,
+            framePos.X.Offset + delta.X,
+            framePos.Y.Scale,
+            framePos.Y.Offset + delta.Y
+        )
+    end
 end)
 
--- Close/Show fungsi
+-- Fungsi Close/Show
 local hidden = false
 CloseBtn.MouseButton1Click:Connect(function()
-hidden = not hidden
-ButtonFrame.Visible = not hidden
-SaveBtn.Visible = not hidden
-if hidden then
-CloseBtn.Text = "+"
-Frame.Size = UDim2.new(0, 240, 0, 40)
-else
-CloseBtn.Text = "X"
-Frame.Size = UDim2.new(0, 240, 0, 260)
-end
-end)
+    hidden = not hidden
+    ButtonFrame.Visible = not hidden
+    SaveBtn.Visible = not hidden
 
+    if hidden then
+        CloseBtn.Text = "+"
+        Frame.Size = UDim2.new(0, 220, 0, 35)
+    else
+        CloseBtn.Text = "–"
+        Frame.Size = UDim2.new(0, 220, 0, 230)
+    end
+end)
