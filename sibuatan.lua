@@ -1,80 +1,132 @@
+-- Load Rayfield UI
+local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Rayfield/main/source"))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "Teleport & Player Tools",
+    LoadingTitle = "Loading...",
+    LoadingSubtitle = "By Lynx",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "MyScripts",
+        FileName = "Settings"
+    },
+    Discord = { Enabled = false },
+    KeySystem = false
+})
+
+-- Variables
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+local hum = char:WaitForChild("Humanoid")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 -- Lokasi default
 local locations = {
     ["Basecamp"]        = Vector3.new(987, 112, -698),
     ["Pos Pendakian"]   = Vector3.new(5200, 4000, 2100),
     ["Puncak Sibuatan"] = Vector3.new(5344, 8113, 2117),
-    ["Checkpoint 19"]   = Vector3.new(1667, 4284, 5191), -- lokasi baru
+    ["Checkpoint 19"]   = Vector3.new(1667, 4284, 5191),
 }
-
--- GUI Setup
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-local Frame = Instance.new("Frame", ScreenGui)
-Frame.Size = UDim2.new(0, 220, 0, 230)
-Frame.Position = UDim2.new(0, 20, 0, 100)
-Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-Frame.Active = true
-Frame.Draggable = true
-
-local UIStroke = Instance.new("UIStroke", Frame)
-UIStroke.Thickness = 2
-UIStroke.Color = Color3.fromRGB(255, 255, 255)
-
-local CloseBtn = Instance.new("TextButton", Frame)
-CloseBtn.Size = UDim2.new(0, 30, 0, 30)
-CloseBtn.Position = UDim2.new(1, -35, 0, 5)
-CloseBtn.Text = "–"
-CloseBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
-CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-
-local ButtonFrame = Instance.new("Frame", Frame)
-ButtonFrame.Size = UDim2.new(1, -10, 1, -50)
-ButtonFrame.Position = UDim2.new(0, 5, 0, 40)
-ButtonFrame.BackgroundTransparency = 1
-
-local UIListLayout = Instance.new("UIListLayout", ButtonFrame)
-UIListLayout.Padding = UDim.new(0, 5)
-
-local SaveBtn = Instance.new("TextButton", Frame)
-SaveBtn.Size = UDim2.new(0, 200, 0, 30)
-SaveBtn.Position = UDim2.new(0, 10, 1, -40)
-SaveBtn.Text = "Save Lokasi"
-SaveBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
-SaveBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 
 -- Fungsi teleport
 local function teleportTo(pos)
-    if char and char:FindFirstChild("HumanoidRootPart") then
-        char:MoveTo(pos)
+    if hrp then
+        hrp.CFrame = CFrame.new(pos)
     end
 end
 
--- Generate tombol teleport
+-- Teleport Tab
+local TeleportTab = Window:CreateTab("Teleport", 4483362458)
 for name, pos in pairs(locations) do
-    local btn = Instance.new("TextButton", ButtonFrame)
-    btn.Size = UDim2.new(1, -10, 0, 30)
-    btn.Text = name
-    btn.BackgroundColor3 = Color3.fromRGB(0, 0, 100)
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.MouseButton1Click:Connect(function()
-        teleportTo(pos)
-    end)
+    TeleportTab:CreateButton({
+        Name = name,
+        Callback = function()
+            teleportTo(pos)
+        end
+    })
 end
 
--- Fungsi Close/Show
-local hidden = false
-CloseBtn.MouseButton1Click:Connect(function()
-    hidden = not hidden
-    ButtonFrame.Visible = not hidden
-    SaveBtn.Visible = not hidden
+-- Player Tab
+local PlayerTab = Window:CreateTab("Player", 4483362458)
 
-    if hidden then
-        CloseBtn.Text = "+"
-        Frame.Size = UDim2.new(0, 220, 0, 35)
-    else
-        CloseBtn.Text = "–"
-        Frame.Size = UDim2.new(0, 220, 0, 230)
+-- Fly V2 Anti-Deteksi
+local flying = false
+local flySpeed = 50
+local flyVelocity, flyGyro
+
+PlayerTab:CreateSlider({
+    Name = "Fly Speed",
+    Range = {10, 200},
+    Increment = 5,
+    Suffix = "Studs/s",
+    CurrentValue = 50,
+    Flag = "FlySpeedSlider",
+    Callback = function(value)
+        flySpeed = value
     end
-end)
+})
+
+PlayerTab:CreateToggle({
+    Name = "Fly V2 (Anti-Deteksi)",
+    CurrentValue = false,
+    Flag = "FlyToggle",
+    Callback = function(value)
+        flying = value
+        if flying then
+            flyGyro = Instance.new("BodyGyro", hrp)
+            flyGyro.P = 9e4
+            flyGyro.MaxTorque = Vector3.new(9e4, 9e4, 9e4)
+
+            flyVelocity = Instance.new("BodyVelocity", hrp)
+            flyVelocity.MaxForce = Vector3.new(9e4, 9e4, 9e4)
+            flyVelocity.Velocity = Vector3.new(0,0,0)
+
+            local function flyLoop()
+                RunService.RenderStepped:Connect(function()
+                    if not flying then
+                        if flyGyro then flyGyro:Destroy() end
+                        if flyVelocity then flyVelocity:Destroy() end
+                        return
+                    end
+                    local camCF = workspace.CurrentCamera.CFrame
+                    local moveDir = Vector3.new(0,0,0)
+                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir += camCF.LookVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir -= camCF.LookVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir -= camCF.RightVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir += camCF.RightVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDir += Vector3.new(0,1,0) end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then moveDir -= Vector3.new(0,1,0) end
+                    if moveDir.Magnitude > 0 then
+                        moveDir = moveDir.Unit * flySpeed
+                    end
+                    flyVelocity.Velocity = moveDir
+                    flyGyro.CFrame = CFrame.new(hrp.Position, hrp.Position + camCF.LookVector)
+                end)
+            end
+            flyLoop()
+        else
+            if flyGyro then flyGyro:Destroy() end
+            if flyVelocity then flyVelocity:Destroy() end
+        end
+    end
+})
+
+-- Fall Anti-Damage Toggle
+local fallDamageDisabled = false
+PlayerTab:CreateToggle({
+    Name = "Fall Anti-Damage",
+    CurrentValue = false,
+    Flag = "FallToggle",
+    Callback = function(value)
+        fallDamageDisabled = value
+        if fallDamageDisabled then
+            hum:GetPropertyChangedSignal("Health"):Connect(function()
+                if hum.Health < hum.MaxHealth then
+                    hum.Health = hum.MaxHealth
+                end
+            end)
+        end
+    end
+})
