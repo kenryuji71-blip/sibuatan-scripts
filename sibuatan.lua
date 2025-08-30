@@ -2,13 +2,13 @@
 local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Rayfield/main/source"))()
 
 local Window = Rayfield:CreateWindow({
-    Name = "Teleport & Player Tools",
+    Name = "Mount Sibuatan",
     LoadingTitle = "Loading...",
-    LoadingSubtitle = "By Lynx",
+    LoadingSubtitle = "By Satanico",
     ConfigurationSaving = {
-        Enabled = true,
+        Enabled = false,
         FolderName = "MyScripts",
-        FileName = "Settings"
+        FileName = "Satanicohub"
     },
     Discord = { Enabled = false },
     KeySystem = false
@@ -58,7 +58,7 @@ local flyVelocity, flyGyro
 
 PlayerTab:CreateSlider({
     Name = "Fly Speed",
-    Range = {10, 200},
+    Range = {16, 300},
     Increment = 5,
     Suffix = "Studs/s",
     CurrentValue = 50,
@@ -70,7 +70,7 @@ PlayerTab:CreateSlider({
 
 PlayerTab:CreateToggle({
     Name = "Fly V2 (Anti-Deteksi)",
-    CurrentValue = false,
+    CurrentValue = true,
     Flag = "FlyToggle",
     Callback = function(value)
         flying = value
@@ -114,10 +114,10 @@ PlayerTab:CreateToggle({
 })
 
 -- Fall Anti-Damage Toggle
-local fallDamageDisabled = false
+local fallDamageDisabled = true
 PlayerTab:CreateToggle({
     Name = "Fall Anti-Damage",
-    CurrentValue = false,
+    CurrentValue = true,
     Flag = "FallToggle",
     Callback = function(value)
         fallDamageDisabled = value
